@@ -84,9 +84,19 @@ jobs:
         run: |
           mkdir -p ~/wheels && cd ~/wheels && uvx -p 3.11 pip wheel sysrepo
 
+      - name: download gnmi_pb2.py & gnmi_pb2_grpc.py
+        run: |
+          mkdir -p ~/gnmi && cd ~/gnmi && wget https://github.com/openconfig/gnmi/blob/master/proto/gnmi/gnmi_pb2_grpc.py
+          wget https://github.com/openconfig/gnmi/blob/master/proto/gnmi/gnmi_pb2.py
+      
+      - name: build gnmi wheels
+        run: |
+          uv build && echo "wheel=$(ls dist/*.whl)" >> $GITHUB_ENV
+
       - name: Collect all builds
         run: |
           mkdir -p ~/builds && cp ~/*/pkg/pkgs/debian-12/*/* ~/wheels/*.whl ~/builds/
+          cp ~/dist/*.whl ~/builds/
           # also include a tgz with everything
           cd ~ && tar -cvzf ~/builds.tgz builds/ && mv ~/builds.tgz ~/builds/
 
